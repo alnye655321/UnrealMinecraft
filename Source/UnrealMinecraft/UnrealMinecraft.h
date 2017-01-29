@@ -3,7 +3,7 @@
 #ifndef __UNREALMINECRAFT_H__
 #define __UNREALMINECRAFT_H__
 
-#include "EngineMinimal.h"
+#include "Engine.h"
 
 
 #endif
