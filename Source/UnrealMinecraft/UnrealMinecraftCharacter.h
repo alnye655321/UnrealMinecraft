@@ -1,6 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
+#include "Block.h"
 #include "UnrealMinecraftCharacter.generated.h"
 
 class UInputComponent;
@@ -16,7 +17,7 @@ class AUnrealMinecraftCharacter : public ACharacter
 
 	/** Gun mesh: 1st person view (seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class USkeletalMeshComponent* FP_Gun;
+	class USkeletalMeshComponent* FP_WieldedItem;
 
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -45,6 +46,8 @@ public:
 	AUnrealMinecraftCharacter();
 
 	virtual void BeginPlay();
+
+	virtual void Tick(float DeltaTime) override;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -125,6 +128,17 @@ protected:
 	 * @returns true if touch controls were enabled.
 	 */
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
+
+private:
+	// check if there is a block infront of the player
+	void CheckForBlocks();
+
+	// stores the block currently being looked at by player
+	ABlock* CurrentBlock;
+
+	// the characters reach for a raycast
+	float Reach;
+
 
 public:
 	/** Returns Mesh1P subobject **/
