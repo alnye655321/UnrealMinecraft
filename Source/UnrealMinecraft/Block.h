@@ -19,6 +19,19 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 		UStaticMeshComponent* SM_Block;
+
+	uint8 MinimumMaterial; // level of pickaxe
 	
+	UPROPERTY(EditDefaultsOnly)
+		float Resistance; // how fast block can break
+
+	UPROPERTY(BlueprintReadWrite)
+		float BreakingStage; // block will break in stages, starts at 0
+
+	void Break(); // called every time we want to break block down another stage
+
+	void ResetBlock(); // reset breaking stages
+
+	void OnBroken(bool HasRequiredPickaxe); // called when block is fully broken, if player has the right level pickaxe
 	
 };

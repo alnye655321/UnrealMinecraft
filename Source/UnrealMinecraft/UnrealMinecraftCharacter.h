@@ -130,6 +130,20 @@ protected:
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
 
 private:
+
+	// true if player if breaking block, false otherwise
+	bool bIsBreaking;
+
+	// called when hitting with a tool
+	void OnHit();
+	void EndHit();
+
+	// plays the mining animation
+	void PlayHitAnim();
+
+	// called when player wants to break a block
+	void BreakBlock();
+
 	// check if there is a block infront of the player
 	void CheckForBlocks();
 
@@ -138,6 +152,10 @@ private:
 
 	// the characters reach for a raycast
 	float Reach;
+
+	// timer handles
+	FTimerHandle BlockBreakingHandle; // time between breaking blocks
+	FTimerHandle HitAnimHandle; // time between pick axe swings, manages the animation
 
 
 public:

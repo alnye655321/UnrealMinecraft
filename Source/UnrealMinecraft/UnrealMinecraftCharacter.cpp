@@ -124,7 +124,8 @@ void AUnrealMinecraftCharacter::SetupPlayerInputComponent(class UInputComponent*
 	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AUnrealMinecraftCharacter::TouchStarted);
 	if (EnableTouchscreenMovement(PlayerInputComponent) == false)
 	{
-		PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUnrealMinecraftCharacter::OnFire);
+		PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AUnrealMinecraftCharacter::OnHit); // called OnHit() when left mouse button is pressed
+		PlayerInputComponent->BindAction("Interact", IE_Released, this, &AUnrealMinecraftCharacter::EndHit); // called EndHit() when left mouse button is released
 	}
 
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AUnrealMinecraftCharacter::OnResetVR);
@@ -263,6 +264,56 @@ bool AUnrealMinecraftCharacter::EnableTouchscreenMovement(class UInputComponent*
 	return bResult;
 }
 
+void AUnrealMinecraftCharacter::OnHit() // called after left mouse button is pressed
+{
+	PlayHitAnim(); // play the hit animation
+
+	if (CurrentBlock != nullptr) // if player is looking at a block
+	{
+		bIsBreaking = true; // player is breaking block
+
+		float TimeBetweenBreaks = ((CurrentBlock->Resistance) / 100.f) / 2; // strength of weapon dictates how fast player breaks the blocks
+
+		GetWorld()->GetTimerManager().SetTimer(BlockBreakingHandle, this, &AUnrealMinecraftCharacter::BreakBlock, TimeBetweenBreaks, true); // timer for breaking blocks, calls BreakBlock()
+		GetWorld()->GetTimerManager().SetTimer(HitAnimHandle, this, &AUnrealMinecraftCharacter::PlayHitAnim, 0.4f, true); // timer for swing animation, calls PlayHitAnim(), harded carded to 0.4 sec
+	}
+}
+
+void AUnrealMinecraftCharacter::EndHit()
+{
+	GetWorld()->GetTimerManager().ClearTimer(BlockBreakingHandle); // clear both timers
+	GetWorld()->GetTimerManager().ClearTimer(HitAnimHandle);
+
+	bIsBreaking = false; // no longer breaking blocks
+
+	if (CurrentBlock != nullptr) // if player is looking at a block
+	{
+		CurrentBlock->ResetBlock(); // reset the block if player is still looking at it
+	}
+}
+
+void AUnrealMinecraftCharacter::PlayHitAnim()
+{
+	// try and play a firing animation if specified
+	if (FireAnimation != NULL)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+}
+
+void AUnrealMinecraftCharacter::BreakBlock()
+{
+	if (bIsBreaking && CurrentBlock != nullptr && !CurrentBlock->IsPendingKill())
+	{
+		CurrentBlock->Break(); // break the block if player is looking at it, not already breaking, and hasnt already killed it
+	}
+}
+
 void AUnrealMinecraftCharacter::CheckForBlocks()
 {
 	FHitResult LinetraceHit;
@@ -285,6 +336,6 @@ void AUnrealMinecraftCharacter::CheckForBlocks()
 	else
 	{
 		CurrentBlock = PotentialBlock;
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, *CurrentBlock->GetName()); // log actor
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, *CurrentBlock->GetName()); // log actor
 	}
 }
