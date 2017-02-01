@@ -15,10 +15,6 @@ class AUnrealMinecraftCharacter : public ACharacter
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	class USkeletalMeshComponent* Mesh1P;
 
-	/** Gun mesh: 1st person view (seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class USkeletalMeshComponent* FP_WieldedItem;
-
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USceneComponent* FP_MuzzleLocation;
@@ -48,6 +44,14 @@ public:
 	virtual void BeginPlay();
 
 	virtual void Tick(float DeltaTime) override;
+
+	/** Wielded Item mesh: 1st person view (seen only by self) */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		class USkeletalMeshComponent* FP_WieldedItem;
+
+	// keeps track of type of wieldable player is holding, from enum in wieldable
+	uint8 ToolType;
+	uint8 MaterialType;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -156,6 +160,8 @@ private:
 	// timer handles
 	FTimerHandle BlockBreakingHandle; // time between breaking blocks
 	FTimerHandle HitAnimHandle; // time between pick axe swings, manages the animation
+
+
 
 
 public:

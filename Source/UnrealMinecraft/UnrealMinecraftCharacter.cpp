@@ -328,6 +328,11 @@ void AUnrealMinecraftCharacter::CheckForBlocks()
 
 	ABlock* PotentialBlock = Cast<ABlock>(LinetraceHit.GetActor()); // whatever actor the player hits with the raycast see if its a block
 
+	if (PotentialBlock != CurrentBlock && CurrentBlock != nullptr) // has player stopped looking at block, if so reset the block
+	{
+		CurrentBlock->ResetBlock();
+	}
+
 	if (PotentialBlock == NULL) //not a block
 	{
 		CurrentBlock = nullptr;
@@ -335,6 +340,10 @@ void AUnrealMinecraftCharacter::CheckForBlocks()
 	}
 	else
 	{
+		if (CurrentBlock != nullptr && !bIsBreaking)
+		{
+			CurrentBlock->ResetBlock();
+		}
 		CurrentBlock = PotentialBlock;
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, *CurrentBlock->GetName()); // log actor
 	}
