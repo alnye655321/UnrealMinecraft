@@ -16,8 +16,10 @@ AWieldable::AWieldable()
 	PickupTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("PickupTrigger")); // set as UBoxComponent inherited from UShapeComponent in header file, can be changed here to any shape
 
 	PickupTrigger->bGenerateOverlapEvents = true;
-	PickupTrigger->OnComponentBeginOverlap.AddDynamic(this, &AWieldable::OnRadiusEnter); // call OnRadiusEnter() below when a collision overlap occurs
+
+	PickupTrigger->OnComponentBeginOverlap.AddDynamic(this, &AWieldable::OnRadiusEnter);  // call OnRadiusEnter() below when a collision overlap occurs
 	PickupTrigger->AttachTo(WieldableMesh); // attach collision box to wieldable pickup
+	//PickupTrigger->AttachToComponent(WieldableMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale); // updated syntax
 
 	MaterialType = EMaterial::None;
 	ToolType = ETool::Unarmed;
@@ -42,7 +44,7 @@ void AWieldable::Tick( float DeltaTime )
 	WieldableMesh->SetRelativeRotation(rotation);
 }
 
-void AWieldable::OnRadiusEnter(AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void AWieldable::OnRadiusEnter(class UPrimitiveComponent* HitComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	AUnrealMinecraftCharacter* Character = Cast<AUnrealMinecraftCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)); // get reference to player character
 
@@ -54,4 +56,5 @@ void AWieldable::OnRadiusEnter(AActor * OtherActor, UPrimitiveComponent * OtherC
 
 	Destroy(); // destroy the pickup, does not need to be in world anymore
 }
+
 
